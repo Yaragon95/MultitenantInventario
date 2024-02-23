@@ -14,10 +14,10 @@ namespace MultitenantInventario.Data.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Product>> GetAllProductsAsync(string slugtenant)
+        public async Task<IEnumerable<Product>> GetAllProductsAsync(string slugtenant, int? manufactureTypeId)
         {
             return await _context.Products
-                .Where(p => p.SlugTenant == slugtenant).ToListAsync();
+                .Where(p => p.SlugTenant == slugtenant && p.ManufactureTypeId == manufactureTypeId).ToListAsync();
         }
 
         public async Task<Product> GetProductByIdAsync(int productId, string slugtenant)
@@ -44,7 +44,6 @@ namespace MultitenantInventario.Data.Repositories
             {
                 existingProduct.Name = product.Name;
                 existingProduct.Description = product.Description;
-                existingProduct.Duration = product.Duration;
 
             }
             return await _context.SaveChangesAsync();

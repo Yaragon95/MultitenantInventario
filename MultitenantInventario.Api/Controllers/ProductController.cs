@@ -2,6 +2,7 @@
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MultitenantInventario.Application.Dtos;
 using MultitenantInventario.Application.Interfaces;
 using MultitenantInventario.Domain.Entities;
 
@@ -22,12 +23,12 @@ namespace MultitenantInventario.Api.Controllers
         }
 
         [HttpGet("list")]
-        public async Task<IActionResult> GetAllProducts()
+        public async Task<IActionResult> GetAllProducts(int? manufacturyTypeId)
         {
             // Recuperar el OrganizationId del token
-            var organizationId = ObtenerOrganizationIdDesdeToken();
+            var organizationId = GetOrganizationIDFromToken();
 
-            var products = await _productService.GetAllProductsAsync(organizationId);
+            var products = await _productService.GetAllProductsAsync(organizationId, manufacturyTypeId);
             return Ok(products);
         }
 
@@ -35,7 +36,7 @@ namespace MultitenantInventario.Api.Controllers
         public async Task<IActionResult> GetProductById(int id)
         {
             // Recuperar el OrganizationId del token
-            var organizationId = ObtenerOrganizationIdDesdeToken();
+            var organizationId = GetOrganizationIDFromToken();
 
             var product = await _productService.GetProductByIdAsync(id, organizationId);
             if (product == null)
@@ -47,16 +48,13 @@ namespace MultitenantInventario.Api.Controllers
         }
 
         [HttpPost("add")]
-        public async Task<IActionResult> AddProduct([FromBody] ProductDto product)
+        public async Task<IActionResult> AddProduct([FromBody] ProductoDto product)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var organizationId = ObtenerOrganizationIdDesdeToken();
+            var organizationId = GetOrganizationIDFromToken();
 
-            var productRequest = product.Adapt<Product>();
-            productRequest.SlugTenant = organizationId;
-
-            var response = await _productService.AddProductAsync(productRequest, organizationId);
+            var response = await _productService.AddProductAsync(product, organizationId);
 
             return Ok(response);
         }
@@ -65,7 +63,7 @@ namespace MultitenantInventario.Api.Controllers
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] Product product)
         {
             // Recuperar el OrganizationId del token
-            var organizationId = ObtenerOrganizationIdDesdeToken();
+            var organizationId = GetOrganizationIDFromToken();
 
             // Puedes realizar validaciones o ajustes aquí antes de actualizar el producto
             await _productService.UpdateProductAsync(product, organizationId);
@@ -77,7 +75,7 @@ namespace MultitenantInventario.Api.Controllers
         public async Task<IActionResult> DeleteProduct(int id)
         {
             // Recuperar el OrganizationId del token
-            var organizationId = ObtenerOrganizationIdDesdeToken();
+            var organizationId = GetOrganizationIDFromToken();
 
             await _productService.DeleteProductAsync(id, organizationId);
             return NoContent();
@@ -85,7 +83,7 @@ namespace MultitenantInventario.Api.Controllers
 
         // Otros métodos según tus necesidades
 
-        private string ObtenerOrganizationIdDesdeToken()
+        private string GetOrganizationIDFromToken()
         {
             var tenantsClaim = HttpContext.User.FindFirst("Tenant");
 

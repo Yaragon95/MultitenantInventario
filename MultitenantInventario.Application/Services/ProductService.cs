@@ -1,4 +1,6 @@
-﻿using MultitenantInventario.Application.Interfaces;
+﻿using Mapster;
+using MultitenantInventario.Application.Dtos;
+using MultitenantInventario.Application.Interfaces;
 using MultitenantInventario.Domain.Entities;
 using MultitenantInventario.Domain.Interfaces;
 
@@ -13,20 +15,24 @@ namespace MultitenantInventario.Application.Services
             _productRepository = productRepository;
         }
 
-        public async Task<IEnumerable<Product>> GetAllProductsAsync(string organizationId)
+        public async Task<int> AddProductAsync(ProductoDto productDto, string organizationId)
         {
-            return await _productRepository.GetAllProductsAsync(organizationId);
+            // Puedes realizar validaciones o ajustes aquí antes de agregar el producto
+            var product = productDto.Adapt<Product>();
+            product.SlugTenant = organizationId;
+
+            return await _productRepository.AddProductAsync(product, organizationId);
+        }
+
+
+        public async Task<IEnumerable<Product>> GetAllProductsAsync(string organizationId, int? manufacturyTypeId)
+        {
+            return await _productRepository.GetAllProductsAsync(organizationId, manufacturyTypeId);
         }
 
         public async Task<Product> GetProductByIdAsync(int productId, string organizationId)
         {
             return await _productRepository.GetProductByIdAsync(productId, organizationId);
-        }
-
-        public async Task<int> AddProductAsync(Product product, string organizationId)
-        {
-            // Puedes realizar validaciones o ajustes aquí antes de agregar el producto
-            return await _productRepository.AddProductAsync(product, organizationId);
         }
 
         public async Task<int> UpdateProductAsync(Product product, string organizationId)
