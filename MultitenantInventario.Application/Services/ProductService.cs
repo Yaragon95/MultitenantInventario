@@ -24,7 +24,6 @@ namespace MultitenantInventario.Application.Services
             return await _productRepository.AddProductAsync(product, organizationId);
         }
 
-
         public async Task<IEnumerable<Product>> GetAllProductsAsync(string organizationId, int? manufacturyTypeId)
         {
             return await _productRepository.GetAllProductsAsync(organizationId, manufacturyTypeId);

@@ -16,6 +16,10 @@ namespace MultitenantInventario.Data.Repositories
 
         public async Task<IEnumerable<Product>> GetAllProductsAsync(string slugtenant, int? manufactureTypeId)
         {
+
+            if (manufactureTypeId is null) return await _context.Products
+                .Where(p => p.SlugTenant == slugtenant).ToListAsync();
+
             return await _context.Products
                 .Where(p => p.SlugTenant == slugtenant && p.ManufactureTypeId == manufactureTypeId).ToListAsync();
         }

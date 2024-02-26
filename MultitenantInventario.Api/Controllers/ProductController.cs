@@ -1,6 +1,4 @@
-﻿using EdynamicsLog.Prueba.Api.Models;
-using Mapster;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultitenantInventario.Application.Dtos;
 using MultitenantInventario.Application.Interfaces;
